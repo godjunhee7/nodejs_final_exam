@@ -1,63 +1,377 @@
 <!doctype html>
 <html>
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
-    <link rel="stylesheet" href="/public/main.css">
-     
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+  <link rel="stylesheet" href="/public/main.css">
+   
+  <style>
+    .container-flex {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      margin-left: 5%;
+      margin-right: 5%;
+    }
 
+    #map-container {
+      width: 45%;
+    }
 
+    #map {
+      width: 100%;
+      height: 600px;
+    }
 
+    .main-container {
+      width: 45%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
 
-    <title>Reply View</title>
-  </head>
-  <body>
-     
-     <%- include('nav.html') %>
+    .controls {
+      margin-top: 40px; /* map 아래에 여백 추가 */
+      text-align: center;
+    }
 
+    .controls-sensor {
+      margin-top: 70px; /* map 아래에 여백 추가 */
+      text-align: center;
+    }
 
-    <div class="container mt-4">  
-      <h4 class="text-center"><mark>댓글 페이지</mark></h4>
+    fieldset {
+      border: 4px solid #DDA0DD;
+      padding: 20px;
+      margin-top: 50px;
+    }
 
-      <div class="card" style="width: 100%;">
-        <div class="card-body">
-          <h5 class="card-title">할 일: <%= data.제목 %> </h5>
-          <h6 class="card-subtitle mb-2 text-muted">마감 날짜: <%= data.날짜 %> </h6>
-          <br>
-          <p class="card-text">내용: <%= data.내용 %> </p>
+    legend {
+      font-size: 1.2em;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    iframe {
+      display: block;
+      margin: 0 auto;
+    }
+
+    .custom-hr {
+      border: 0;
+      height: 3px;
+      background: linear-gradient(to right, #e6e6fa, #d8bfd8);
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    .btn-toggle {
+      margin-top: 10px;
+      margin-bottom: 10px;
+      color: white !important;
+    }
+
+    .custom-pagination {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .pagination .page-item.active .page-link {
+      background-color: lightgray; /* 선택된 페이지의 배경색 */
+      border-color: gray; /* 선택된 페이지의 테두리색 */
+      color: red; /* 선택된 페이지의 숫자 색상 */
+    }
+  
+    .pagination .page-link {
+      color: red; /* 페이지 링크의 기본 숫자 색상 */
+    }
+  
+    .pagination .page-link:hover {
+      background-color: #B0E2FF; /* 페이지 링크에 마우스를 올렸을 때 배경색 */
+      border-color: lightgray; /* 페이지 링크에 마우스를 올렸을 때 테두리색 */
+    }
+
+    .iframe-container {
+      position: fixed;
+      top: 20px; /* 원하는 위치에 맞게 조정 */
+      right: 10px; /* 원하는 위치에 맞게 조정 */
+      width: 45%; /* 너비 조정 */
+      height: calc(100% - 40px); /* 높이 조정 */
+      overflow: auto; /* 스크롤 가능 */
+      background-color: white; /* 배경색 */
+      border: 4px solid #DDA0DD;
+      padding: 20px;
+      display: none; /* 처음에는 숨기기 */
+    }
+
+  </style>
+
+  <title>Reply View</title>
+</head>
+<body>
+   
+  <% if (isAdmin) { %>
+    <%- include('nav_admin.html', {user: user}) %>
+  <% } else { %>
+    <%- include('nav_user.html', {user: user}) %>
+  <% } %>
+
+   <br><br>
+   <div class="container-flex">
+    <div id="map-container">
+     <div id="map"></div>
+
+        <fieldset>
+          <% if (isAdmin) { %>
+            <legend><mark style="background-color: skyblue;">센서 데이터 현황</mark></legend>
+          <% } else { %>
+            <legend><mark>센서 데이터 현황</mark></legend>
+          <% } %>
+
+          <% if (isAdmin) { %>
+          <div class="controls">
+            <button id="toggle-button" class="btn btn-primary btn-toggle">물 수위 현황</button>
+            <button id="toggle-button1" class="btn btn-danger btn-toggle">일산화 탄소 감지 현황</button>
+            <button id="toggle-button2" class="btn btn-warning btn-toggle">불꽃 감지 현황</button>
+            <button id="toggle-button3" class="btn btn-success btn-toggle">습도 현황</button>
+            <button id="toggle-button4" class="btn btn-info btn-toggle">온도 현황</button>
+          </div>
+          <% } else { %>
+            <div class="controls">
+              <button id="toggle-button1" class="btn btn-danger btn-toggle">일산화 탄소 감지 현황</button>
+              <button id="toggle-button2" class="btn btn-warning btn-toggle">불꽃 감지 현황</button>
+              <button id="toggle-button3" class="btn btn-success btn-toggle">습도 현황</button>
+              <button id="toggle-button4" class="btn btn-info btn-toggle">온도 현황</button>
+            </div>
+          <% } %>
+        </fieldset>
+    </div>
+
+     <div class="main-container">
+      <div class="container mt-4">  
+        <h4 class="text-center"><strong>댓글 페이지</strong></h4>
+        <br>
+        <div class="card" style="width: 100%; height: 400px">
+          <div class="card-body">
+            <h5 class="card-title" style="color: red;"><%= data.제목 %> </h5>
+            <h6 class="card-subtitle mb-2 text-muted">작성 일자 : <%= data.날짜 %> </h6> <hr>
+            <br><br><br>
+            <p class="card-text"><strong><%= data.내용 %></strong></p>
+          </div>
         </div>
       </div>
+      <hr>
+
+      <div class="container mt-4">
+          <h5 class="text-center"><mark style="background-color: lightblue; color: white">댓글 내용</mark></h5>
+          <br>
+          <% for (var i = 0; i < replys.length; i++){ %>      
+            <div style="border: 3px solid lightblue; padding: 10px; margin-bottom: 10px; height: 200px">
+              <br><br>
+              <p class="text-center"> 
+                <strong><span style="color: blue;"><%= replys[i].작성자 %> </span></strong> : 
+                &nbsp; <strong><%= replys[i].댓글내용 %></strong>
+                &nbsp;&nbsp;&nbsp; <span style="font-style: italic;"><%= replys[i].작성시간 %></span> 
+              </p>
+            </div>
+          <% } %>
+          
+      </div>
     </div>
-    <hr>
+  </div>
 
-    <div class="container mt-4">
-        <h5 class="text-center"><mark>댓글내용</mark></h5>
-        <br>
-        <% for (var i = 0; i < replys.length; i++){ %>      
-        <p class="text-center"> <mark><%= replys[i].작성자 %></mark>: &nbsp;<%= replys[i].댓글내용 %>
-          &nbsp;&nbsp;&nbsp; <%= replys[i].작성시간 %> </p>
-        <% } %> 
+    <!-- iframe container -->
+    <div class="iframe-container" id="iframe-container">
+      <strong>System1:</strong> 
+      <iframe id="iframe-1" width="100%" height="250"></iframe>
+      <strong>System2:</strong> 
+      <iframe id="iframe-2" width="100%" height="250"></iframe>
     </div>
 
-  
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 
+    <script>
+      $('#search').click(function(){
+        var 입력한값 = $('#search-input').val();
+        window.location.replace('/search?value=' + 입력한값)
+      });
+      
+      $('.chat').click(function(e){
+        var _id = e.target.dataset.id;
+        var title = e.target.dataset.title;
+        $.post('/chatroom', { 당한사람id : _id, 제목 : title })
+        .then(()=>{
+          console.log('채팅방 게시물 생성완료')
+        })
+        window.location.replace('/chat')
+      });
 
-    <!-- Optional JavaScript; choose one of the two! -->
+      $('#toggle-button').click(function() {
+        var container = $('#iframe-container');
+        var iframe1 = $('#iframe-1');
+        var iframe2 = $('#iframe-2');
+        if (container.is(':visible')) {
+          container.hide();
+        } else {
+          iframe1.attr('src', 'https://thingspeak.com/channels/2532498/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Water&type=step');
+          iframe2.attr('src', 'https://thingspeak.com/channels/2541668/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Water&type=line');
+          container.show();
+        }
+      });
 
-    <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
+      $('#toggle-button1').click(function() {
+        var container = $('#iframe-container');
+        var iframe1 = $('#iframe-1');
+        var iframe2 = $('#iframe-2');
+        if (container.is(':visible')) {
+          container.hide();
+        } else {
+          iframe1.attr('src', 'https://thingspeak.com/channels/2532498/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&max=300&min=0&results=60&title=Gas&type=line');
+          iframe2.attr('src', 'https://thingspeak.com/channels/2541668/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Gas&type=line');
+          container.show();
+        }
+      });
 
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+      $('#toggle-button2').click(function() {
+        var container = $('#iframe-container');
+        var iframe1 = $('#iframe-1');
+        var iframe2 = $('#iframe-2');
+        if (container.is(':visible')) {
+          container.hide();
+        } else {
+          iframe1.attr('src', 'https://thingspeak.com/channels/2532498/charts/3?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Flame&type=line');
+          iframe2.attr('src', 'https://thingspeak.com/channels/2541668/charts/3?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Flame&type=line');
+          container.show();
+        }
+      });
 
-    <!-- Option 2: Separate Popper and Bootstrap JS -->
-    <!--
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js" integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"></script>
-    -->
-  </body>
+      $('#toggle-button3').click(function() {
+        var container = $('#iframe-container');
+        var iframe1 = $('#iframe-1');
+        var iframe2 = $('#iframe-2');
+        if (container.is(':visible')) {
+          container.hide();
+        } else {
+          iframe1.attr('src', 'https://thingspeak.com/channels/2532498/charts/4?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Humidity&type=line');
+          iframe2.attr('src', 'https://thingspeak.com/channels/2541668/charts/4?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Humidity&type=line');
+          container.show();
+        }
+      });
+
+      $('#toggle-button4').click(function() {
+        var container = $('#iframe-container');
+        var iframe1 = $('#iframe-1');
+        var iframe2 = $('#iframe-2');
+        if (container.is(':visible')) {
+          container.hide();
+        } else {
+          iframe1.attr('src', 'https://thingspeak.com/channels/2532498/charts/5?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Temperature&type=line');
+          iframe2.attr('src', 'https://thingspeak.com/channels/2541668/charts/5?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Temperature&type=line');
+          container.show();
+        }
+      });
+    </script>
+
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=78a6af8dfa1a5684791a6ec6d8336bbd"></script>
+
+    <script>
+      var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+          mapOption = { 
+              center: new kakao.maps.LatLng(37.5817, 127.0092), // 지도의 중심좌표
+              level: 3 // 지도의 확대 레벨
+          };
+
+      var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+
+      // 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
+      var mapTypeControl = new kakao.maps.MapTypeControl();
+
+      // 지도에 컨트롤을 추가해야 지도위에 표시됩니다
+      // kakao.maps.ControlPosition은 컨트롤이 표시될 위치를 정의하는데 TOPRIGHT는 오른쪽 위를 의미합니다
+      map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+
+      // 지도 확대 축소를 제어할 수 있는 줌 컨트롤을 생성합니다
+      var zoomControl = new kakao.maps.ZoomControl();
+      map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+      function loadAndDisplayJSONData() {
+        var urls = [
+            "https://arduino-sys1-default-rtdb.asia-southeast1.firebasedatabase.app/.json",
+            "https://arduino-test2-aeb4f-default-rtdb.asia-southeast1.firebasedatabase.app/.json"
+        ];
+
+        urls.forEach(function(url) {
+            $.getJSON(url, function(data) {
+                // 각 시스템의 데이터를 처리합니다.
+                Object.keys(data).forEach(function(systemKey) {
+                    var systemData = data[systemKey];
+                    var lat = systemData.ex_LAT;
+                    var lon = systemData.ex_LON;
+                    var pumpState = systemData.pump_State;
+                    var humidity = systemData.humidity;
+
+                    // 위도, 경도를 사용하여 마커 생성
+                    var markerPosition = new kakao.maps.LatLng(lat, lon);
+                    var markerImageSrc = pumpState == 1 ? '/public/image/red-icon.png' : '/public/image/default-icon.png'; // 마커 이미지 경로
+                    var markerImageSize = new kakao.maps.Size(64, 64); // 마커 이미지 크기
+                    var markerImageOption = {offset: new kakao.maps.Point(27, 69)}; // 마커 이미지 옵션
+                    var markerImage = new kakao.maps.MarkerImage(markerImageSrc, markerImageSize, markerImageOption);
+
+                    var marker = new kakao.maps.Marker({
+                        position: markerPosition,
+                        image: markerImage // 마커 이미지 설정
+                    });
+
+                    // 마커를 지도 위에 표시
+                    marker.setMap(map);
+
+                    // 정보창 생성 및 표시
+                    var iwContent = '<div style="padding:10px; font-size: 18px; font-weight: bold; color: #333; background-color: #fff; border: 2px solid #ddd; border-radius: 10px;">' +
+                      'Pump State: <span style="color: red;">' + systemData.pump_State + '</span><br>' +
+                      'Temperature: <span style="color: blue;">' + systemData.temperature + '°C</span><br>' +
+                      'Humidity: <span style="color: green;">' + systemData.humidity + '%</span>' +
+                      '</div>';
+
+                    var iwPosition = new kakao.maps.LatLng(lat, lon);
+
+                    // 인포윈도우를 생성합니다
+                    var infowindow = new kakao.maps.InfoWindow({
+                        position: iwPosition,
+                        content: iwContent
+                    });
+
+                    // 마커에 마우스오버 이벤트를 등록합니다
+                    kakao.maps.event.addListener(marker, 'mouseover', function() {
+                        // 마커 위에 인포윈도우를 표시합니다
+                        infowindow.open(map, marker);
+                    });
+
+                    // 마커에 마우스아웃 이벤트를 등록합니다
+                    kakao.maps.event.addListener(marker, 'mouseout', function() {
+                        // 마커 위에 인포윈도우를 닫습니다
+                        infowindow.close();
+                    });
+                });
+            }).fail(function() {
+                console.log("Error: Could not load data from " + url);
+            });
+        });
+    }
+
+    // 페이지 로드 시 데이터 로드 실행
+    $(document).ready(function() {
+      loadAndDisplayJSONData();
+    });  
+    </script>
+</body>
 </html>

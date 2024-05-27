@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+  <title>환영합니다. 회원님!</title>
+  <style>
+    .container-flex {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      margin-left: 5%;
+      margin-right: 5%;
+    }
+
+    #map-container {
+      width: 45%;
+    }
+
+    #map {
+      width: 100%;
+      height: 600px;
+    }
+
+    .main-container {
+      width: 45%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .controls {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .system-info {
+      text-align: left;
+      margin-top: 10px;
+    }
+
+    fieldset {
+      border: 4px solid #DDA0DD;
+      padding: 20px;
+      margin-top: 50px;
+    }
+
+    legend {
+      font-size: 1.2em;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    iframe {
+      display: block;
+      margin: 0 auto;
+    }
+
+    .btn-toggle {
+      margin-top: 10px;
+      margin-bottom: 10px;
+      color: white !important;
+    }
+
+    .custom-hr {
+      border: 0;
+      height: 3px;
+      background: linear-gradient(to right, #e6e6fa, #d8bfd8);
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    .custom-pagination {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .pagination .page-item.active .page-link {
+      background-color: lightgray; /* 선택된 페이지의 배경색 */
+      border-color: gray; /* 선택된 페이지의 테두리색 */
+      color: red; /* 선택된 페이지의 숫자 색상 */
+    }
+  
+    .pagination .page-link {
+      color: red; /* 페이지 링크의 기본 숫자 색상 */
+    }
+  
+    .pagination .page-link:hover {
+      background-color: #B0E2FF; /* 페이지 링크에 마우스를 올렸을 때 배경색 */
+      border-color: lightgray; /* 페이지 링크에 마우스를 올렸을 때 테두리색 */
+    }
+
+    .iframe-container {
+      position: fixed;
+      top: 20px; /* 원하는 위치에 맞게 조정 */
+      right: 10px; /* 원하는 위치에 맞게 조정 */
+      width: 45%; /* 너비 조정 */
+      height: calc(100% - 40px); /* 높이 조정 */
+      overflow: auto; /* 스크롤 가능 */
+      background-color: white; /* 배경색 */
+      border: 4px solid #DDA0DD;
+      padding: 20px;
+      display: none; /* 처음에는 숨기기 */
+    }
+
+    
+  </style>
+</head>
+<body>
+    <%- include('nav.html') %>
+
+    <br><br>
+    <div class="container-flex">
+      <div id="map-container">
+        <div id="map"></div>
+
+        <fieldset>
+          <legend><mark>센서 데이터 현황</mark></legend>
+
+          <div class="controls">
+            <button id="toggle-button1" class="btn btn-danger btn-toggle">일산화 탄소 감지 현황</button>
+            <button id="toggle-button2" class="btn btn-warning btn-toggle">불꽃 감지 현황</button>
+            <button id="toggle-button3" class="btn btn-success btn-toggle">습도 현황</button>
+            <button id="toggle-button4" class="btn btn-info btn-toggle">온도 현황</button>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="main-container">
+        <h4 class="ml-2 my-3 text-center"><strong>공지사항 및 Q&A</strong></h4> <br>
+        
+        <div class="container">
+          <ul class="list-group">
+            <% for (var i = 0; i < posts.length; i++){ %>
+            <li class="list-group-item" style="height: 300px;">
+              <% if (posts[i].isAdmin) { %>
+              <strong>
+                <p>글번호 : <%= posts[i]._id %></p>
+              </strong>
+              <% } else { %>
+                <p>글번호 : <%= posts[i]._id %></p>
+              <% } %>
+              
+              <% if (posts[i].isAdmin) { %>
+                <h4 style="color: red;"><strong>★ 공지사항 ★</strong></h4> <br>
+                <p style="color: red;">작성자 : <%= posts[i].작성자이름 %> (관리자)</p><br>
+              <% } else { %>
+                <h5><strong>Q&A</strong></h5> <br>
+                <p>작성자 : <%= posts[i].작성자이름 %> (사용자)</p><br>
+              <% } %>
+              
+              <% if (posts[i].isAdmin) { %>
+                <h4><strong>제목 : <a href="/detail/<%= posts[i]._id %>"> <span style="color: red;"><mark style="color: red;"><%= posts[i].제목 %></mark></span></a></strong></h4> <br>
+              <% } else { %>
+                <h4><strong>제목 : <a href="/detail/<%= posts[i]._id %>"><%= posts[i].제목 %></a></strong></h4> <br>
+              <% } %>
+
+              <% if (posts[i].isAdmin) { %>
+                <br>
+                <p style="font-style: italic;"><strong >작성 일자 : <%= posts[i].날짜 %></strong></p>
+              <% } else { %>
+                <p style="font-style: italic;">작성 일자 : <%= posts[i].날짜 %></p>
+              <% } %>
+            
+                <br>
+               
+                <br><br>
+              </form> 
+            </li>
+            <% } %>
+          </ul>
+        </div>
+
+        <br><br>
+
+        <nav aria-label="Page navigation" class="custom-pagination" style="width: 100%;">
+          <ul class="pagination">
+            <% if (currentPage > 1) { %>
+              <li class="page-item">
+                <a class="page-link" href="/user?page=<%= currentPage - 1 %>" aria-label="Previous">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+            <% } %>
+            <% for (var i = 1; i <= totalPages; i++) { %>
+              <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                <a class="page-link" href="/user?page=<%= i %>"><%= i %></a>
+              </li>
+            <% } %>
+            <% if (currentPage < totalPages) { %>
+              <li class="page-item">
+                <a class="page-link" href="/user?page=<%= currentPage + 1 %>" aria-label="Next">
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+            <% } %>
+          </ul>
+        </nav>
+
+        <br><br>
+
+      </div>
+
+      <!-- iframe container -->
+      <div class="iframe-container" id="iframe-container">
+        <strong>System1:</strong> 
+        <iframe id="iframe-1" width="100%" height="250"></iframe>
+        <strong>System2:</strong> 
+        <iframe id="iframe-2" width="100%" height="250"></iframe>
+      </div>
+
+    </div>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    
+    <script>
+      $('#search').click(function(){
+        var 입력한값 = $('#search-input').val();
+        window.location.replace('/search?value=' + 입력한값)
+      });
+      
+      $('.chat').click(function(e){
+        var _id = e.target.dataset.id;
+        var title = e.target.dataset.title;
+        $.post('/chatroom', { 당한사람id : _id, 제목 : title })
+        .then(()=>{
+          console.log('채팅방 게시물 생성완료')
+        })
+        window.location.replace('/chat')
+      });
+
+      $('#toggle-button1').click(function() {
+        var container = $('#iframe-container');
+        var iframe1 = $('#iframe-1');
+        var iframe2 = $('#iframe-2');
+        if (container.is(':visible')) {
+          container.hide();
+        } else {
+          iframe1.attr('src', 'https://thingspeak.com/channels/2532498/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&max=300&min=0&results=60&title=Gas&type=line');
+          iframe2.attr('src', 'https://thingspeak.com/channels/2541668/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Gas&type=line');
+          container.show();
+        }
+      });
+
+      $('#toggle-button2').click(function() {
+        var container = $('#iframe-container');
+        var iframe1 = $('#iframe-1');
+        var iframe2 = $('#iframe-2');
+        if (container.is(':visible')) {
+          container.hide();
+        } else {
+          iframe1.attr('src', 'https://thingspeak.com/channels/2532498/charts/3?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Flame&type=line');
+          iframe2.attr('src', 'https://thingspeak.com/channels/2541668/charts/3?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Flame&type=line');
+          container.show();
+        }
+      });
+
+      $('#toggle-button3').click(function() {
+        var container = $('#iframe-container');
+        var iframe1 = $('#iframe-1');
+        var iframe2 = $('#iframe-2');
+        if (container.is(':visible')) {
+          container.hide();
+        } else {
+          iframe1.attr('src', 'https://thingspeak.com/channels/2532498/charts/4?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Humidity&type=line');
+          iframe2.attr('src', 'https://thingspeak.com/channels/2541668/charts/4?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Humidity&type=line');
+          container.show();
+        }
+      });
+
+      $('#toggle-button4').click(function() {
+        var container = $('#iframe-container');
+        var iframe1 = $('#iframe-1');
+        var iframe2 = $('#iframe-2');
+        if (container.is(':visible')) {
+          container.hide();
+        } else {
+          iframe1.attr('src', 'https://thingspeak.com/channels/2532498/charts/5?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Temperature&type=line');
+          iframe2.attr('src', 'https://thingspeak.com/channels/2541668/charts/5?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Temperature&type=line');
+          container.show();
+        }
+      });
+    </script>
+
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=78a6af8dfa1a5684791a6ec6d8336bbd"></script>
+    
+    <script>
+      var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+          mapOption = { 
+              center: new kakao.maps.LatLng(37.5817, 127.0092), // 지도의 중심좌표
+              level: 3 // 지도의 확대 레벨
+          };
+  
+      var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+  
+      // 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
+      var mapTypeControl = new kakao.maps.MapTypeControl();
+  
+      // 지도에 컨트롤을 추가해야 지도위에 표시됩니다
+      // kakao.maps.ControlPosition은 컨트롤이 표시될 위치를 정의하는데 TOPRIGHT는 오른쪽 위를 의미합니다
+      map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+  
+      // 지도 확대 축소를 제어할 수 있는 줌 컨트롤을 생성합니다
+      var zoomControl = new kakao.maps.ZoomControl();
+      map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+  
+      function loadAndDisplayJSONData() {
+        var urls = [
+            "https://arduino-sys1-default-rtdb.asia-southeast1.firebasedatabase.app/.json",
+            "https://arduino-test2-aeb4f-default-rtdb.asia-southeast1.firebasedatabase.app/.json"
+        ];
+    
+        urls.forEach(function(url) {
+            $.getJSON(url, function(data) {
+                // 각 시스템의 데이터를 처리합니다.
+                Object.keys(data).forEach(function(systemKey) {
+                    var systemData = data[systemKey];
+                    var lat = systemData.ex_LAT;
+                    var lon = systemData.ex_LON;
+                    var pumpState = systemData.pump_State;
+                    var humidity = systemData.humidity;
+  
+                    // 위도, 경도를 사용하여 마커 생성
+                    var markerPosition = new kakao.maps.LatLng(lat, lon);
+                    var markerImageSrc = pumpState == 1 ? '/public/image/red-icon.png' : '/public/image/default-icon.png'; // 마커 이미지 경로
+                    var markerImageSize = new kakao.maps.Size(64, 64); // 마커 이미지 크기
+                    var markerImageOption = {offset: new kakao.maps.Point(27, 69)}; // 마커 이미지 옵션
+                    var markerImage = new kakao.maps.MarkerImage(markerImageSrc, markerImageSize, markerImageOption);
+  
+                    var marker = new kakao.maps.Marker({
+                        position: markerPosition,
+                        image: markerImage // 마커 이미지 설정
+                    });
+    
+                    // 마커를 지도 위에 표시
+                    marker.setMap(map);
+    
+                    // 정보창 생성 및 표시
+                    var iwContent = '<div style="padding:10px; font-size: 18px; font-weight: bold; color: #333; background-color: #fff; border: 2px solid #ddd; border-radius: 10px;">' +
+                      'Pump State: <span style="color: red;">' + systemData.pump_State + '</span><br>' +
+                      'Temperature: <span style="color: blue;">' + systemData.temperature + '°C</span><br>' +
+                      'Humidity: <span style="color: green;">' + systemData.humidity + '%</span>' +
+                      '</div>';
+    
+                    var iwPosition = new kakao.maps.LatLng(lat, lon);
+    
+                    // 인포윈도우를 생성합니다
+                    var infowindow = new kakao.maps.InfoWindow({
+                        position: iwPosition,
+                        content: iwContent
+                    });
+    
+                    // 마커에 마우스오버 이벤트를 등록합니다
+                    kakao.maps.event.addListener(marker, 'mouseover', function() {
+                        // 마커 위에 인포윈도우를 표시합니다
+                        infowindow.open(map, marker);
+                    });
+    
+                    // 마커에 마우스아웃 이벤트를 등록합니다
+                    kakao.maps.event.addListener(marker, 'mouseout', function() {
+                        // 마커 위에 인포윈도우를 닫습니다
+                        infowindow.close();
+                    });
+                });
+            }).fail(function() {
+                console.log("Error: Could not load data from " + url);
+            });
+        });
+    }
+  
+    // 페이지 로드 시 데이터 로드 실행
+    $(document).ready(function() {
+      loadAndDisplayJSONData();
+    });  
+    </script>
+
+</body>
+</html>

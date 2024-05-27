@@ -1,0 +1,44 @@
+<style>
+  .login-link {
+    margin-left: auto;
+    margin-right: calc(20%);
+  }
+
+  .Formargin {
+    margin-left: calc(90%);
+  }
+
+  .custom-margin {
+    margin-left: 700px;
+  }
+
+  .custom-margin-right {
+    margin-right: 140px;
+  }
+</style>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="/admin">
+    <img src="/public/image/산림청.jpg" width="200" height="80">
+  </a>
+  <strong><a class="navbar-brand" href="/admin">실시간 산불 플랫폼</a></strong>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <strong>
+    <a class="navbar-brand" href="/mypage" style="margin-left: 70px; color: gray">내 정보</a>
+  </strong>
+  <strong>
+    <a class="navbar-brand Formargin">권한 : &nbsp;&nbsp;&nbsp;<span style="color: blue;">관리자</span></a>
+  </strong>
+  <div class="collapse navbar-collapse custom-margin" id="navbarNav">
+    <strong><a class="navbar-brand"><span style="color: orange;"><%= user.id %> (관리자)</span>&nbsp;님! &nbsp;&nbsp;환영합니다.</a></strong>
+    <ul class="navbar-nav login-link">
+      <li>
+        <form action="/logout" method="get">
+          <button type="submit" class="btn btn-primary custom-margin-right">로그아웃</button>
+        </form>
+      </li>
+    </ul>
+  </div>
+</nav>

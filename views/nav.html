@@ -1,20 +1,26 @@
+<style>
+  .login-link {
+    margin-left: auto;
+    margin-right: calc(20%); /* 오른쪽 끝으로부터 30% 떨어지게 조정 */
+  }
+
+</style>
+
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="/home">Hansung University</a>
+    <a class="navbar-brand" href="/">
+      <img src="public/image/산림청.jpg" width="200" height="80">
+    </a>
+    <strong><a class="navbar-brand" href="/">실시간 산불 플랫폼</a></strong>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav">
-        <li class="nav-item active">
-          <a class="nav-link" href="/home">홈 <span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/write">글 쓰기</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/mypage">내 정보</a>
-        <li class="nav-item">
-          <a class="nav-link" href="/logout">로그아웃</a>
-      </ul>
+     <ul class="navbar-nav login-link"> 
+      <li>
+      <form action="/login" method="get">
+        <button type="submit" class="btn btn-danger">로그인</button>
+      </form>
+      </li>
+    </ul> 
     </div>
   </nav>
