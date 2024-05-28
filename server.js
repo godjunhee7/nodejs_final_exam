@@ -34,7 +34,7 @@ function 로그인했니(요청, 응답, next) {
     next() 
   } 
   else { 
-    응답.send("<script>alert('로그인 후 이용해주세여!'); window.location.href = '/login';</script>");
+    응답.send("<script>alert('로그인 후 이용 가능합니다.'); window.location.href = '/login';</script>");
   } 
 } 
 
